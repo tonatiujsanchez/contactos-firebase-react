@@ -1,28 +1,90 @@
 import { useState } from "react"
+import { doc, updateDoc, deleteDoc } from "firebase/firestore"
+import db from "../firebase/firebaseConfig"
+
 import styled from "styled-components"
+import useForm from "../hooks/useForm"
+
+
 
 
 
 const ContactoListItem = ({ contacto }) => {
-
+    
     const [ editando, setEditado ] = useState(false)
+        
+    const [ { nombre, correo }, handleInputChange, resetForm ] = useForm({
+        nombre: contacto.nombre, 
+        correo: contacto.correo
+    })
 
-    const { id, nombre, correo } = contacto
+    const handleForm = ( e ) =>{
+        e.preventDefault()
+
+        if( [nombre.trim(), correo.trim()].includes('') ){
+            console.log('Todos son obligatorios');
+            return
+        }
+
+        const contactoActualizado = {
+            nombre: nombre.trim(),
+            correo: correo.trim()
+        }
+
+        actualizarContacto( contactoActualizado )
+    }
+
+
+    const actualizarContacto = async( contactoActualizado ) => {
+        try {
+           await updateDoc( doc( db, 'contactos', contacto.id ), contactoActualizado)
+            setEditado( false )
+
+        } catch ( error ) {
+            console.log('Hubo un error. No se pudo Actualizar el contacto. ', error);
+        }
+    }
+
+    const cancelarEditar = () =>{
+        setEditado( false )
+        resetForm()
+    }
+
+    const eliminarContacto = async( idContacto ) =>{
+        try {
+            await deleteDoc( doc( db, 'contactos', idContacto ) )
+        } catch (error) {
+            console.log('Hubo un error. No se pudo Eliminar el contacto. ', error);
+        }
+    }
 
 
   return (
     <ContenedorContacto>
         {editando
-            ?<form>
-                <Input type="text" name="nombre" placeholder="Nombre" autoComplete="off" />
-                <Input type="email" name="correo" placeholder="Correo" autoComplete="off" />
+            ?<form onSubmit={ handleForm }>
+                <Input 
+                    type="text" 
+                    name="nombre"
+                    value={ nombre } 
+                    onChange={ handleInputChange }
+                    placeholder="Nombre" 
+                    autoComplete="off" />
+                <Input 
+                    type="email" 
+                    name="correo"
+                    value={ correo } 
+                    onChange={ handleInputChange }
+                    placeholder="Correo" 
+                    autoComplete="off" />
                 <Boton type="submit">Actualizar</Boton>
+                <Boton type="button" onClick={ cancelarEditar }>Cancelar</Boton>
              </form>
             :<>
-                <Nombre>{ nombre }</Nombre>
-                <Correo>{ correo }</Correo>
-                <Boton onClick={()=>setEditado( !editando )} type="button">Editar</Boton>
-                <Boton type="button">Eliminar</Boton>
+                <Nombre>{ contacto.nombre }</Nombre>
+                <Correo>{ contacto.correo }</Correo>
+                <Boton onClick={ ()=> setEditado( true ) } type="button">Editar</Boton>
+                <Boton onClick={ ()=> eliminarContacto( contacto.id ) } type="button">Eliminar</Boton>
              </>
 
         }

@@ -17,11 +17,11 @@ const useForm = ( estadoIncial = {} ) =>{
     }
 
 
-    const restForm = () =>{
+    const resetForm = () =>{
         setValues( estadoIncial )
     }
 
-    return [ values, handleInputChange, restForm ]
+    return [ values, handleInputChange, resetForm ]
 
 }
 

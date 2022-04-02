@@ -1,5 +1,5 @@
 import styled from "styled-components"
-import { collection, doc, onSnapshot } from "firebase/firestore"
+import { collection, onSnapshot } from "firebase/firestore"
 import db from "../firebase/firebaseConfig"
 import { useEffect, useState } from "react"
 import ContactoListItem from "./ContactoListItem"
@@ -18,13 +18,12 @@ const ContactosList = () => {
                 ( snapshot )=>{
                     const arrContactos = snapshot.docs.map( doc => ( { ...doc.data(), id: doc.id } ))
                     setContactos( arrContactos );
+                },
+                ( error )=>{
+                    console.log(error);
                 })
 
     }
-
-    // obtenerContactos()
-
-
 
   return (
     contactos.length > 0 

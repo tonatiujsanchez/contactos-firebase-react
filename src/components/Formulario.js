@@ -6,7 +6,7 @@ import { collection, addDoc } from "firebase/firestore"
 
 const Formulario = () => {
 
-    const [ { nombre, correo }, handleInputChange, restForm ] = useForm({
+    const [ { nombre, correo }, handleInputChange, resetForm ] = useForm({
         nombre: '',
         correo: ''
     })
@@ -31,7 +31,7 @@ const Formulario = () => {
         try {
             const docRef = await addDoc(collection(db, "contactos"), nuevoContacto);
             console.log("Document written with ID: ", docRef.id);
-            restForm()
+            resetForm()
           } catch (e) {
             console.error("Error al intertar agregar un nuevo contacto: ", e);
           }
